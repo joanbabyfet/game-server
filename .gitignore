@@ -1,0 +1,51 @@
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+
+# Logs
+*.log
+logs/
+
+# Temp
+tmp/
+temp/
+
+# Runtime
+*.pid
+
+# Binary
+*.out
+
+# Docker
+.env
+docker-compose.override.yml
+
+# LuaRocks
+lua_modules/
+
+# Coverage
+coverage/
+
+# Local config
+game/config/local.lua
+game/config/dev.lua
+
+# Cache
+.cache/
+
+# Test
+testdata/
+
+# Official Skynet source
+skynet/
+
+data/
+
+# Private game logic
+game/logic/
+
+# sql
+game/sql/

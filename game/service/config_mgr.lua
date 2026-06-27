@@ -1,0 +1,165 @@
+local skynet = require "skynet"
+require "skynet.manager" -- 加载此模块后才能调用 skynet.register
+local json = require "json"
+local game_config_model = require "model.game_config"
+
+local CONFIG = {}
+
+local VERSION = 0
+
+local CMD = {}
+
+-- 构建 Symbol Map
+local function build_symbol_map(game_cfg)
+
+    local symbol_map = {}
+
+    local symbols = game_cfg.symbols
+
+    if not symbols then
+        return
+    end
+
+    for _, symbol in ipairs(symbols) do
+        symbol_map[symbol.type] = symbol.id
+    end
+
+    game_cfg.symbol_map = symbol_map
+end
+
+-- 加载全部配置(内部函数, 只有 service 自己可以调用)
+local function load_all()
+
+    local list = game_config_model.get_all()
+
+    local new_config = {}
+
+    for _, row in ipairs(list) do
+
+        local game_id = row.game_id
+
+        if not new_config[game_id] then
+            new_config[game_id] = {}
+        end
+
+        new_config[game_id][row.config_key] =
+            json.decode(row.config_value)
+    end
+
+    -- 构建 Symbol Map
+    for _, game_cfg in pairs(new_config) do
+        build_symbol_map(game_cfg)
+    end
+
+    CONFIG = new_config
+
+    VERSION = VERSION + 1
+
+    skynet.error(string.format(
+        "[CONFIG] load success version=%d count=%d",
+        VERSION,
+        #list
+    ))
+end
+
+-- 加载单个游戏配置
+local function load_game(game_id)
+
+    local list = game_config_model.get_by_game(game_id)
+
+    local game_cfg = {}
+
+    for _, row in ipairs(list) do
+
+        game_cfg[row.config_key] =
+            json.decode(row.config_value)
+
+    end
+
+    -- 构建 Symbol Map
+    build_symbol_map(game_cfg)
+
+    CONFIG[game_id] = game_cfg
+
+    VERSION = VERSION + 1
+
+    skynet.error(string.format(
+        "[CONFIG] reload game=%d version=%d",
+        game_id,
+        VERSION
+    ))
+end
+
+-- 获取某个游戏配置
+function CMD.get_game(game_id)
+
+    return CONFIG[game_id]
+
+end
+
+-- 获取指定配置
+function CMD.get(game_id, key)
+
+    local game = CONFIG[game_id]
+
+    if not game then
+        return nil
+    end
+
+    return game[key]
+
+end
+
+-- 获取全部游戏配置
+function CMD.get_all()
+
+    return CONFIG
+
+end
+
+-- 获取配置版本
+function CMD.version()
+
+    return VERSION
+
+end
+
+-- 热更新全部配置
+function CMD.reload()
+
+    load_all()
+
+    return VERSION
+
+end
+
+-- 热更新单个游戏配置
+function CMD.reload_game(game_id)
+
+    load_game(game_id)
+
+    return VERSION
+
+end
+
+skynet.start(function()
+
+    load_all()
+
+    -- 注册 Lua 消息处理函数
+    skynet.dispatch("lua", function(session, source, cmd, ...)
+
+        local f = CMD[cmd]
+
+        assert(f, cmd)
+
+        skynet.retpack(
+            f(...)
+        )
+
+    end)
+
+    -- 向 launcher 注册服务
+    skynet.register(".config_mgr")
+
+end)
