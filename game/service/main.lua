@@ -9,6 +9,7 @@ skynet.start(function()
     local config_mgr = skynet.newservice("config_mgr")
     -- 定时同步
     skynet.newservice("jackpot_sync")
+    skynet.newservice("rtp_sync")
     -- 创建全局唯一服务
     local game_mgr = skynet.uniqueservice("game_mgr")
     -- 创建服务（Actor）, 创建一个独立Lua VM 及 消息队列

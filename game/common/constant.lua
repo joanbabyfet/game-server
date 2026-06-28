@@ -23,4 +23,11 @@ M.GAME_STATUS = {
     ONLINE  = 1,
 }
 
+-- Free Spin 状态
+M.FREE_SPIN_STATUS = {
+    RUNNING = 0, -- 进行中
+    FINISHED = 1, -- 已完成
+    CANCELED = 2, -- 已取消
+}
+
 return M

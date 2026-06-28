@@ -138,6 +138,23 @@ function M.set_json(key, value)
 
 end
 
+function M.hgetall_map(key)
+
+    local data = command("hgetall", key)
+
+    if not data then
+        return nil
+    end
+
+    local map = {}
+
+    for i = 1, #data, 2 do
+        map[data[i]] = data[i + 1]
+    end
+
+    return map
+end
+
 -- 这里用 Lua 的 __index 元方法动态代理所有 Redis 命令
 setmetatable(M, {
     __index = function(_, cmd)

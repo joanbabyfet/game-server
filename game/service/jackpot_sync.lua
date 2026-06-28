@@ -8,10 +8,10 @@ local function cache_key(game_id)
     return "jackpot:" .. game_id
 end
 
--- 同步单个奖池
+-- 同步单个游戏奖池
 local function sync_pool(game_id)
 
-    local pool = redis.hgetall(cache_key(game_id))
+    local pool = redis.hgetall_map(cache_key(game_id))
 
     if not pool or next(pool) == nil then
         return

@@ -17,22 +17,46 @@ end
 -- 更新某游戏jackpot奖池金额
 function M.update(data)
 
+    local now = os.time()
+
     local sql = string.format([[
-        UPDATE jackpot_pool
-        SET
-            mini=%d,
-            minor=%d,
-            major=%d,
-            grand=%d,
-            update_time = %d
-        WHERE game_id=%d
+        INSERT INTO jackpot_pool(
+            game_id,
+            mini,
+            minor,
+            major,
+            grand,
+            create_time,
+            update_time
+        )
+        VALUES(
+            %d,
+            %d,
+            %d,
+            %d,
+            %d,
+            %d,
+            %d
+        )
+        ON DUPLICATE KEY UPDATE
+
+        mini = VALUES(mini),
+
+        minor = VALUES(minor),
+
+        major = VALUES(major),
+
+        grand = VALUES(grand),
+
+        update_time = VALUES(update_time)
     ]],
+        data.game_id,
         data.mini,
         data.minor,
         data.major,
         data.grand,
-        os.time(),
-        data.game_id
+        now,
+        now
     )
 
     return db.query(sql)

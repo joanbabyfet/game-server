@@ -77,26 +77,43 @@ local function test_login()
 end
 
 -- 测试Spin
-local function test_spin(uid, game_id)
+local function test_spin(uid, game_id, count)
+
+    count = count or 1
 
     local slot = skynet.localname(".slot")
-    
-    local ret = skynet.call(
-        slot,
-        "lua",
-        "spin",
-        uid,
-        game_id,
-        10
-    )
 
-    assert(ret.code == 0, ret.msg)
+    local total_win = 0
 
-    skynet.error("[TEST][SPIN] success")
-    skynet.error("[TEST][SPIN] order_no =", ret.data.order_no)
-    skynet.error("[TEST][SPIN] win_amount =", ret.data.win_amount)
-    skynet.error("[TEST][SPIN] balance =", ret.data.balance)
+    for i = 1, count do
+        local ret = skynet.call(
+            slot,
+            "lua",
+            "spin",
+            uid,
+            game_id,
+            10
+        )
 
+        assert(ret.code == 0, ret.msg)
+
+        total_win = total_win + ret.data.win_amount
+
+        skynet.error(string.format(
+            "[TEST][SPIN] %d/%d order=%s win=%.2f balance=%.2f",
+            i,
+            count,
+            ret.data.order_no,
+            ret.data.win_amount,
+            ret.data.balance
+        ))
+    end
+
+    skynet.error(string.format(
+        "[TEST][SPIN] total=%d total_win=%.2f",
+        count,
+        total_win
+    ))
 end
 
 -- 测试Wallet
@@ -152,7 +169,8 @@ function CMD.run()
 
     local uid = test_login()
 
-    test_spin(uid, game_id)
+    -- 连续测试100次 Spin
+    test_spin(uid, game_id, 1)
 
     test_wallet(uid)
 
