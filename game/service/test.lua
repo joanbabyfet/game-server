@@ -1,6 +1,9 @@
 local skynet = require "skynet"
 require "skynet.manager" -- 加载此模块后才能调用 skynet.register
 local json = require "json"
+local util = require "common.util"
+local wallet_logic = require "logic.wallet"
+local jackpot_logic = require "logic.jackpot"
 
 -- 自动测试用
 local CMD = {}
@@ -74,7 +77,7 @@ local function test_login()
 end
 
 -- 测试Spin
-local function test_spin(uid)
+local function test_spin(uid, game_id)
 
     local slot = skynet.localname(".slot")
     
@@ -83,7 +86,7 @@ local function test_spin(uid)
         "lua",
         "spin",
         uid,
-        1,
+        game_id,
         10
     )
 
@@ -97,20 +100,35 @@ local function test_spin(uid)
 end
 
 -- 测试Wallet
-local function test_wallet()
+local function test_wallet(uid)
 
-    -- TODO
+    local wallet, err = wallet_logic.info(uid)
 
-    skynet.error("[TEST][WALLET] skip")
+    assert(wallet, err and err.msg)
+
+    skynet.error(
+        "[TEST][WALLET] balance =",
+        util.to_amount(wallet.balance)
+    )
 
 end
 
 -- 测试Jackpot
-local function test_jackpot()
+local function test_jackpot(game_id)
 
-    -- TODO
+    local pool, err = jackpot_logic.pool(game_id)
 
-    skynet.error("[TEST][JACKPOT] skip")
+    assert(pool, err and err.msg)
+
+    skynet.error(
+        string.format(
+            "[TEST][JACKPOT] mini=%d minor=%d major=%d grand=%d",
+            pool.mini,
+            pool.minor,
+            pool.major,
+            pool.grand
+        )
+    )
 
 end
 
@@ -126,17 +144,19 @@ end
 -- Run
 function CMD.run()
 
+    local game_id = 1
+
     test_config()
 
     test_reload()
 
     local uid = test_login()
 
-    test_spin(uid)
+    test_spin(uid, game_id)
 
-    test_wallet()
+    test_wallet(uid)
 
-    test_jackpot()
+    test_jackpot(game_id)
 
     test_rtp()
 

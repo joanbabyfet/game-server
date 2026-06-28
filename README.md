@@ -4,17 +4,19 @@
 
 ## 项目特点
 
-* 老虎机 Spin 游戏逻辑
-* Jackpot 奖池
-* Free Spin 免费旋转
-* Bonus Game 奖励游戏
-* RTP 统计
-* 游戏配置管理
-* 回合（Round）管理
-* 注单（Order）管理
-* 幂等（Request ID）
-* Rollback 回滚支持
-* 钱包（Wallet）管理
+* 基于 Skynet 的高并发 Slot 游戏服务器
+* Reel Strip + Payline 数学模型
+* Wild、Scatter、Free Spin 支持
+* Jackpot 奖池（Redis）
+* Wallet 钱包（Redis）
+* Config Manager 配置中心
+* Request ID 幂等控制
+* Round / 注单 管理
+* Redis 缓存 + MySQL 持久化架构
+* 金额最小单位设计（避免浮点误差）
+* 自动配置热更新
+* 完整自动化测试
+* 模块化游戏配置，支持多游戏扩展
 
 ## 技术栈
 

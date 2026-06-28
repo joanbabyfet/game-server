@@ -14,41 +14,46 @@ function M.get(game_id)
     return db.get_one(sql)
 end
 
--- 增加某游戏jackpot奖池金额
-function M.add(game_id, field, amount)
+-- 更新某游戏jackpot奖池金额
+function M.update(data)
+
     local sql = string.format([[
         UPDATE jackpot_pool
         SET
-            %s = %s + %d,
+            mini=%d,
+            minor=%d,
+            major=%d,
+            grand=%d,
             update_time = %d
-        WHERE game_id = %d
+        WHERE game_id=%d
     ]],
-        field,
-        field,
-        amount,
+        data.mini,
+        data.minor,
+        data.major,
+        data.grand,
         os.time(),
-        game_id
+        data.game_id
     )
 
     return db.query(sql)
 end
 
 -- 重置某游戏jackpot奖池金额
-function M.reset(game_id, field, amount)
-    local sql = string.format([[
-        UPDATE jackpot_pool
-        SET
-            %s = %d,
-            update_time = %d
-        WHERE game_id = %d
-    ]],
-        field,
-        amount,
-        os.time(),
-        game_id
-    )
+-- function M.reset(game_id, field, amount)
+--     local sql = string.format([[
+--         UPDATE jackpot_pool
+--         SET
+--             %s = %d,
+--             update_time = %d
+--         WHERE game_id = %d
+--     ]],
+--         field,
+--         amount,
+--         os.time(),
+--         game_id
+--     )
 
-    return db.query(sql)
-end
+--     return db.query(sql)
+-- end
 
 return M
