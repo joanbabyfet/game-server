@@ -31,6 +31,7 @@ logic/      游戏逻辑 (暂不公开)
 model/      数据模型
 service/    服务模块
 common/     公共组件
+sql/        初始化 SQL 文件
 ```
 
 ## 快速启动

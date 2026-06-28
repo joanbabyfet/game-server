@@ -1,6 +1,7 @@
 local skynet = require "skynet"
 local redis = require "skynet.db.redis"
 local conf = require "config.redis"
+local json = require "json"
 
 local M = {}
 
@@ -97,6 +98,44 @@ local function command(cmd, ...)
     end
 
     return ret
+end
+
+function M.get_json(key)
+
+    local value = command("get", key)
+
+    if not value then
+        return nil
+    end
+
+    local ok, ret = pcall(json.decode, value)
+
+    if not ok then
+        skynet.error(string.format(
+            "[REDIS ERROR] json decode failed, key=%s",
+            key
+        ))
+        return nil
+    end
+
+    return ret
+
+end
+
+function M.set_json(key, value)
+
+    local ok, data = pcall(json.encode, value)
+
+    if not ok then
+        skynet.error(string.format(
+            "[REDIS ERROR] json encode failed, key=%s",
+            key
+        ))
+        return nil
+    end
+
+    return command("set", key, data)
+
 end
 
 -- 这里用 Lua 的 __index 元方法动态代理所有 Redis 命令

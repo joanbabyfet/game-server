@@ -79,4 +79,21 @@ function M.sub(uid, amount)
     return ret.affected_rows == 1
 end
 
+-- 是否存在
+function M.exists(uid)
+
+    local sql = string.format([[
+        SELECT 1
+        FROM wallet
+        WHERE uid=%d
+        LIMIT 1
+    ]],
+        uid
+    )
+
+    local ret = db.query(sql)
+
+    return ret and #ret > 0
+end
+
 return M

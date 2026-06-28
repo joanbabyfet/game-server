@@ -142,6 +142,7 @@ function CMD.reload_game(game_id)
 
 end
 
+-- config_mgr 本身就是一个常驻 Service
 skynet.start(function()
 
     load_all()
