@@ -142,6 +142,11 @@ function CMD.reload_game(game_id)
 
 end
 
+-- 健康检查(对外接口, 可以被其它 Service 调用)
+function CMD.ping()
+    return "pong"
+end
+
 -- config_mgr 本身就是一个常驻 Service
 skynet.start(function()
 
