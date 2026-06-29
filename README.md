@@ -9,6 +9,7 @@
 * Wild、Scatter、Free Spin 支持
 * Jackpot 奖池（Redis 主存 + MySQL 定时同步）
 * RTP 统计（Redis 主存 + MySQL 定时同步）
+* Risk Control 风控系统（最大倍率、单局封顶，支持 Agent / Player 扩展）
 * Wallet 钱包（Redis）
 * Config Manager 配置中心
 * Request ID 幂等控制
