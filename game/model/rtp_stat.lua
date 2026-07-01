@@ -25,11 +25,11 @@ function M.update(data)
         )
         ON DUPLICATE KEY UPDATE
 
-        total_spin = total_spin + VALUES(total_spin),
+        total_spin = VALUES(total_spin),
 
-        total_bet = total_bet + VALUES(total_bet),
+        total_bet = VALUES(total_bet),
 
-        total_win = total_win + VALUES(total_win),
+        total_win = VALUES(total_win),
 
         update_time = VALUES(update_time)
     ]],

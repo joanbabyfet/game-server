@@ -155,6 +155,21 @@ function M.hgetall_map(key)
     return map
 end
 
+function M.hmset(key, data)
+
+    local args = {key}
+
+    for k, v in pairs(data) do
+        table.insert(args, k)
+        table.insert(args, v)
+    end
+
+    return command(
+        "hmset",
+        table.unpack(args)
+    )
+end
+
 -- 这里用 Lua 的 __index 元方法动态代理所有 Redis 命令
 setmetatable(M, {
     __index = function(_, cmd)

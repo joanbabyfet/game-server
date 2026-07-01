@@ -12,7 +12,6 @@ function M.create(data)
         INSERT INTO free_spin(
             free_spin_id,
             uid,
-            agent_id,
             game_id,
             trigger_order_no,
             total_count,
@@ -26,7 +25,6 @@ function M.create(data)
             %s,
             %d,
             %d,
-            %d,
             %s,
             %d,
             %d,
@@ -38,7 +36,6 @@ function M.create(data)
     ]],
         mysql.quote_sql_str(data.free_spin_id),
         data.uid,
-        data.agent_id,
         data.game_id,
         mysql.quote_sql_str(data.trigger_order_no),
         data.total_count,

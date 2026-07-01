@@ -9,8 +9,8 @@ math.random()
 math.random()
 math.random()
 
--- 金额单位 1 金币 = 10000 最小单位
-M.MONEY_SCALE = 10000
+-- 金额单位 1 金币 = 100 最小单位
+M.MONEY_SCALE = 100
 
 -- UUID v4
 function M.uuid()

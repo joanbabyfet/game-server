@@ -23,7 +23,7 @@ skynet.start(function()
         local test = skynet.newservice("test")
         
         -- 发送1条 lua 消息给test服务(异步发送不阻塞启动流程), 每次服务器启动, 自动执行一次完整测试, 不需要手动输入任何命令
-        skynet.send(test, "lua", "run")
+        --skynet.send(test, "lua", "run")
     end
 
     skynet.error("game start success")

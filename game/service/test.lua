@@ -77,8 +77,10 @@ local function test_login()
 end
 
 -- 测试Spin
-local function test_spin(uid, game_id, count)
+local function test_spin(uid, game_id, bet, count)
 
+    -- 下注默认 10 USD
+    bet = bet or 1000
     count = count or 1
 
     local slot = skynet.localname(".slot")
@@ -92,7 +94,7 @@ local function test_spin(uid, game_id, count)
             "spin",
             uid,
             game_id,
-            10
+            bet
         )
 
         assert(ret.code == 0, ret.msg)
@@ -170,7 +172,7 @@ function CMD.run()
     local uid = test_login()
 
     -- 连续测试100次 Spin
-    test_spin(uid, game_id, 1)
+    test_spin(uid, game_id, 10, 1000)
 
     test_wallet(uid)
 
