@@ -1,4 +1,5 @@
 local skynet = require "skynet"
+local conf = require "config.game"
 
 local M = {}
 
@@ -6,7 +7,7 @@ local M = {}
 local EPOCH = 1704067200000 -- 2024-01-01 00:00:00
 
 -- 机器ID (0~1023)
-local WORKER_ID = 1
+local WORKER_ID = conf.SNOWFLAKE.WORKER_ID
 
 local last_ts = 0
 local sequence = 0
@@ -51,11 +52,19 @@ function M.next_id()
     -- 12bit sequence
 
     local id =
-        timestamp * 2^22 +
-        WORKER_ID * 2^12 +
-        sequence
+        ((timestamp << 22) |
+        (WORKER_ID << 12) |
+        sequence)
 
-    return string.format("%.0f", id)
+    skynet.error(string.format(
+        "[SNOWFLAKE] ts=%d timestamp=%d seq=%d id=%s",
+        ts,
+        timestamp,
+        sequence,
+        tostring(id)
+    ))
+
+    return tostring(id)
 end
 
 return M

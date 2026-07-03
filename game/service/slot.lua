@@ -5,12 +5,31 @@ local response = require "common.response"
 
 local CMD = {}
 
-function CMD.spin(uid, game_id, bet)
-    local data, err = slot_logic.spin(uid, game_id, bet)
+-- 普通旋转
+function CMD.spin(uid, agent_id, game_id, bet)
+    local data, err = slot_logic.spin(uid, agent_id, game_id, bet)
 
     if err then
         return response.error(err.code, err.msg)
     end
+
+    -- 删除内部字段，不返回给客户端
+    data._internal = nil
+
+    return response.success(data)
+end
+
+-- Free Spin
+function CMD.play_free_spin(uid, free_spin_id, request_id)
+
+    local data, err = slot_logic.play_free_spin(uid, free_spin_id, request_id)
+
+    if err then
+        return response.error(err.code, err.msg)
+    end
+
+    -- 删除内部字段，不返回给客户端
+    data._internal = nil
 
     return response.success(data)
 end

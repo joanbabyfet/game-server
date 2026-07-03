@@ -1,5 +1,6 @@
 local snowflake = require "common.snowflake"
 local skynet = require "skynet"
+local conf = require "config.game"
 
 local M = {}
 
@@ -10,7 +11,7 @@ math.random()
 math.random()
 
 -- 金额单位 1 金币 = 100 最小单位
-M.MONEY_SCALE = 100
+M.MONEY_SCALE = conf.MONEY_SCALE
 
 -- UUID v4
 function M.uuid()
@@ -29,7 +30,11 @@ end
 
 -- 生成注单号 (雪花ID)
 function M.gen_order_no()
-    return "S" .. snowflake.next_id()
+    local id = snowflake.next_id()
+
+    skynet.error("[GEN_ORDER]", id, type(id))
+
+    return "S" .. id
 end
 
 -- 生成局号 (雪花ID)

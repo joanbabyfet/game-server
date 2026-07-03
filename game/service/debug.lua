@@ -86,7 +86,7 @@ function CMD.login(account)
 end
 
 -- Slot
-function CMD.spin(uid, game_id, bet)
+function CMD.spin(uid, agent_id, game_id, bet)
 
     local slot = skynet.queryservice(".slot")
 
@@ -95,6 +95,7 @@ function CMD.spin(uid, game_id, bet)
         "lua",
         "spin",
         uid,
+        agent_id,
         game_id,
         bet
     )

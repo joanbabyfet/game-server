@@ -70,14 +70,14 @@ local function test_login()
 
     assert(ret.code == 0, ret.msg)
 
-    skynet.error("[TEST][LOGIN] uid =", ret.data.uid)
+    skynet.error("[TEST][LOGIN] uid =", ret.data)
 
-    return ret.data.uid
+    return ret.data
 
 end
 
--- 测试Spin
-local function test_spin(uid, game_id, bet, count)
+-- 测试 Spin + Free Spin
+local function test_spin(uid, agent_id, game_id, bet, count)
 
     -- 下注默认 10 USD
     bet = bet or 1000
@@ -88,13 +88,17 @@ local function test_spin(uid, game_id, bet, count)
     local total_win = 0
 
     for i = 1, count do
+        -- 普通 Spin
+        local request_id = util.uuid()
         local ret = skynet.call(
             slot,
             "lua",
             "spin",
             uid,
+            agent_id,
             game_id,
-            bet
+            bet,
+            request_id
         )
 
         assert(ret.code == 0, ret.msg)
@@ -102,17 +106,58 @@ local function test_spin(uid, game_id, bet, count)
         total_win = total_win + ret.data.win_amount
 
         skynet.error(string.format(
-            "[TEST][SPIN] %d/%d order=%s win=%.2f balance=%.2f",
+            "[TEST][SPIN] %d/%d request=%s order=%s win=%.2f balance=%.2f",
             i,
             count,
+            request_id,
             ret.data.order_no,
             ret.data.win_amount,
             ret.data.balance
         ))
+
+        -- Trigger Free Spin 
+        local fs = ret.data.free_spin
+        if fs and fs.trigger then
+            -- 写入日志
+            skynet.error(string.format(
+                "[TEST][FREE_SPIN] trigger id=%s total=%d",
+                fs.free_spin_id,
+                fs.total_count
+            ))
+            
+            local free_spin_id = fs.free_spin_id
+            while fs.remain_count > 0 do
+                local free_request_id = util.uuid()
+                local free_ret = skynet.call(
+                    slot,
+                    "lua",
+                    "play_free_spin",
+                    uid,
+                    free_spin_id,   -- 永远用第一次的 ID
+                    free_request_id
+                )
+
+                assert(free_ret.code == 0, free_ret.msg)
+
+                total_win = total_win + free_ret.data.win_amount
+
+                fs = free_ret.data.free_spin
+
+                skynet.error(string.format(
+                    "[TEST][FREE_SPIN] request=%s remain=%d win=%.2f balance=%.2f",
+                    free_request_id,
+                    fs.remain_count,
+                    free_ret.data.win_amount,
+                    free_ret.data.balance
+                ))
+            end
+
+            skynet.error("[TEST][FREE_SPIN] finished")
+        end
     end
 
     skynet.error(string.format(
-        "[TEST][SPIN] total=%d total_win=%.2f",
+        "[TEST][TOTAL] spin=%d total_win=%.2f",
         count,
         total_win
     ))
@@ -169,12 +214,12 @@ function CMD.run()
 
     test_reload()
 
-    local uid = test_login()
+    local user = test_login()
 
     -- 连续测试100次 Spin
-    test_spin(uid, game_id, 10, 1000)
+    test_spin(user.uid, user.agent_id, game_id, 10, 100)
 
-    test_wallet(uid)
+    test_wallet(user.uid)
 
     test_jackpot(game_id)
 

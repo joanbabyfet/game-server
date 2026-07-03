@@ -8,11 +8,12 @@ local M = {}
 function M.create(data)
 
     local sql = string.format([[
-        INSERT INTO `order`(
+        INSERT INTO `game_order`(
             request_id,
             order_no,
             round_id,
             uid,
+            agent_id,
             game_id,
             bet_amount,
             original_win,
@@ -23,6 +24,8 @@ function M.create(data)
             reels,
             win_lines,
             is_free_spin,
+            free_spin_id,
+            free_spin_index,
             status,
             settle_time,
             create_time
@@ -39,7 +42,10 @@ function M.create(data)
             %d,
             %d,
             %d,
+            %d,
             %s,
+            %s,
+            %d,
             %s,
             %d,
             %d,
@@ -51,6 +57,7 @@ function M.create(data)
         mysql.quote_sql_str(data.order_no),
         mysql.quote_sql_str(data.round_id),
         data.uid,
+        data.agent_id,
         data.game_id,
         data.bet_amount,
         data.original_win,
@@ -61,11 +68,13 @@ function M.create(data)
         mysql.quote_sql_str(json.encode(data.reels)),
         mysql.quote_sql_str(json.encode(data.win_lines)),
         data.is_free_spin or 0,
+        mysql.quote_sql_str(data.free_spin_id or ""),
+        data.free_spin_index or 0,
         data.status,
         data.settle_time,
         data.create_time
     )
-
+    
     return db.query(sql)
 end
 
@@ -74,8 +83,8 @@ function M.get_by_request_id(request_id)
 
     local sql = string.format([[
         SELECT *
-        FROM `order`
-        WHERE request_id='%s'
+        FROM `game_order`
+        WHERE request_id= %s
         LIMIT 1
     ]], mysql.quote_sql_str(request_id))
 
