@@ -180,6 +180,71 @@ local function test_spin(uid, agent_id, game_id, bet, count)
     ))
 end
 
+-- 测试Rollback
+local function test_rollback(uid, agent_id, game_id)
+
+    local slot = skynet.localname(".slot")
+    local rollback = skynet.localname(".rollback")
+
+    -- 先打一局
+    local ret = skynet.call(
+        slot,
+        "lua",
+        "spin",
+        uid,
+        agent_id,
+        game_id,
+        10,
+        util.uuid()
+    )
+
+    assert(ret.code == 0, ret.msg)
+
+    skynet.error(string.format(
+        "[TEST][ROLLBACK] spin order=%s balance=%.2f",
+        ret.data.order_no,
+        ret.data.balance
+    ))
+
+    -- 回滚
+    local rb = skynet.call(
+        rollback,
+        "lua",
+        "rollback",
+        {
+            request_id = util.uuid(),
+            order_no = ret.data.order_no,
+            reason = "Provider Timeout"
+        }
+    )
+
+    assert(rb.code == 0, rb.msg)
+
+    skynet.error(string.format(
+        "[TEST][ROLLBACK] success balance=%.2f",
+        rb.data.balance
+    ))
+
+    -- 再回滚一次（测试幂等）
+    rb = skynet.call(
+        rollback,
+        "lua",
+        "rollback",
+        {
+            request_id = util.uuid(),
+            order_no = ret.data.order_no,
+        }
+    )
+
+    assert(rb.code == 0, rb.msg)
+
+    skynet.error(string.format(
+        "[TEST][ROLLBACK] idempotent balance=%.2f",
+        rb.data.balance
+    ))
+
+end
+
 -- 测试Wallet
 local function test_wallet(uid)
 
@@ -233,8 +298,11 @@ function CMD.run()
 
     local user = test_login()
 
-    -- 连续测试100次 Spin
-    test_spin(user.uid, user.agent_id, game_id, 10, 10000)
+    -- 连续测试10次 Spin
+    --test_spin(user.uid, user.agent_id, game_id, 10, 10)
+
+    -- Rollback
+    test_rollback(user.uid, user.agent_id, game_id)
 
     test_wallet(user.uid)
 

@@ -16,6 +16,7 @@ skynet.start(function()
     local gate = skynet.newservice("gate")
     local login = skynet.newservice("login")
     local slot = skynet.newservice("slot")
+    local rollback = skynet.newservice("rollback")
     local debug = skynet.newservice("debug")
 
     -- 自动测试 (放在最后)

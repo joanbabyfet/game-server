@@ -47,6 +47,11 @@ function M.gen_free_spin_id()
     return "FS" .. snowflake.next_id()
 end
 
+-- 生成回滚单号 (雪花ID)
+function M.gen_rollback_no()
+    return "RB" .. snowflake.next_id()
+end
+
 -- 生成用户id
 function M.gen_uid()
     return tostring(snowflake.next_id())

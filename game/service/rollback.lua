@@ -13,11 +13,11 @@ local CMD = {}
 --     uid        = 10001,
 --     agent_id   = 1,
 -- }
-function CMD.rollback(req)
+function CMD.rollback(data)
 
-    assert(type(req) == "table", "invalid request")
+    assert(type(data) == "table", "invalid request")
 
-    local balance, err = wallet_logic.rollback(req)
+    local balance, err = wallet_logic.rollback(data)
 
     if err then
         return response.error(err.code, err.msg)

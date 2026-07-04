@@ -121,12 +121,14 @@ function M.get_by_order_no(order_no)
 end
 
 -- 更新订单为已回滚 (只有已结算才能回滚)
-function M.rollback(order_no)
+function M.rollback(order_no, reason)
 
     local sql = string.format([[
         UPDATE `%s`
         SET
-            status = %d
+            status = %d,
+            rollback_reason = %s,
+            rollback_time = %d
         WHERE
             order_no = %s
         AND
@@ -135,6 +137,8 @@ function M.rollback(order_no)
     ]],
         TABLE,
         M.STATUS.ROLLBACK,
+        mysql.quote_sql_str(reason),
+        os.time(),
         mysql.quote_sql_str(order_no),
         M.STATUS.SETTLED
     )
