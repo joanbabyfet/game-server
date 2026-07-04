@@ -10,6 +10,18 @@ M.STATUS = {
     ONLINE  = 1,
 }
 
+-- 获取全部游戏
+function M.get_all()
+
+    local sql = string.format([[
+        SELECT *
+        FROM %s
+    ]], TABLE)
+
+    return db.query(sql)
+
+end
+
 -- 获取游戏信息
 function M.get(game_id)
 

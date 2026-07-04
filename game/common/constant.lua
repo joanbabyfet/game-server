@@ -27,6 +27,8 @@ M.ERROR = {
     SYMBOL_MAP_NOT_FOUND    = -2005,
     BET_TOO_SMALL           = -2006,
     BET_TOO_LARGE           = -2007,
+    GAME_DISABLED           = -2008,
+    GAME_MAINTENANCE        = -2009,
 
     -- Free Spin
     FREE_SPIN_NOT_FOUND      = -3001,
@@ -35,6 +37,7 @@ M.ERROR = {
     FREE_SPIN_UPDATE_FAILED  = -3004,
     FREE_SPIN_CREATE_FAILED  = -3005,
     FREE_SPIN_FINISHED       = -3006,
+    FREE_SPIN_GAME_ERROR     = -3007,
 
     -- Order
     ORDER_NOT_FOUND             = -4001,

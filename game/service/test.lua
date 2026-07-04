@@ -134,6 +134,8 @@ local function test_spin(uid, agent_id, game_id, bet, count)
                     "lua",
                     "play_free_spin",
                     uid,
+                    agent_id,
+                    game_id,
                     free_spin_id,   -- 永远用第一次的 ID
                     free_request_id
                 )
@@ -299,7 +301,7 @@ function CMD.run()
     local user = test_login()
 
     -- 连续测试10次 Spin
-    --test_spin(user.uid, user.agent_id, game_id, 10, 10)
+    test_spin(user.uid, user.agent_id, game_id, 10, 10)
 
     -- Rollback
     test_rollback(user.uid, user.agent_id, game_id)

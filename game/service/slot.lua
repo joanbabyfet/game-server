@@ -5,8 +5,31 @@ local response = require "common.response"
 
 local CMD = {}
 
+local config_mgr = skynet.localname(".config_mgr")
+
 -- 普通旋转
 function CMD.spin(uid, agent_id, game_id, bet)
+    -- 游戏配置
+    local cfg = skynet.call(
+        config_mgr,
+        "lua",
+        "get_game",
+        game_id
+    )
+
+    if not cfg then
+        return response.error(-2002, "game not found")
+    end
+
+    if cfg.status ~= 1 then
+        return response.error(-2008, "game disabled")
+    end
+
+    if cfg.maintenance == 1 then
+        return response.error(-2009, cfg.maintenance_msg)
+    end
+
+    -- 进入游戏逻辑
     local data, err = slot_logic.spin(uid, agent_id, game_id, bet)
 
     if err then
@@ -17,9 +40,30 @@ function CMD.spin(uid, agent_id, game_id, bet)
 end
 
 -- Free Spin
-function CMD.play_free_spin(uid, free_spin_id, request_id)
+function CMD.play_free_spin(uid, agent_id, game_id, free_spin_id, request_id)
 
-    local data, err = slot_logic.play_free_spin(uid, free_spin_id, request_id)
+    -- 游戏配置
+    local cfg = skynet.call(
+        config_mgr,
+        "lua",
+        "get_game",
+        game_id
+    )
+
+    if not cfg then
+        return response.error(-2002, "game not found")
+    end
+
+    if cfg.status ~= 1 then
+        return response.error(-2008, "game disabled")
+    end
+
+    if cfg.maintenance == 1 then
+        return response.error(-2009, cfg.maintenance_msg)
+    end
+
+    -- 进入游戏逻辑
+    local data, err = slot_logic.play_free_spin(uid, agent_id, game_id, free_spin_id, request_id)
 
     if err then
         return response.error(err.code, err.msg)
