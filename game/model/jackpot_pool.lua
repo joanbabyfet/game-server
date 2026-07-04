@@ -2,14 +2,20 @@ local db = require "common.mysql"
 
 local M = {}
 
+local TABLE = "jackpot_pool"
+
 -- 获取某游戏奖池信息
 function M.get(game_id)
+
     local sql = string.format([[
         SELECT *
-        FROM jackpot_pool
+        FROM %s
         WHERE game_id = %d
         LIMIT 1
-    ]], game_id)
+    ]],
+        TABLE,
+        game_id
+    )
 
     return db.get_one(sql)
 end
@@ -20,7 +26,7 @@ function M.update(data)
     local now = os.time()
 
     local sql = string.format([[
-        INSERT INTO jackpot_pool(
+        INSERT INTO %s(
             game_id,
             mini,
             minor,
@@ -50,6 +56,7 @@ function M.update(data)
 
         update_time = VALUES(update_time)
     ]],
+        TABLE,
         data.game_id,
         data.mini,
         data.minor,
@@ -65,18 +72,19 @@ end
 -- 重置某游戏jackpot奖池金额
 -- function M.reset(game_id, field, amount)
 --     local sql = string.format([[
---         UPDATE jackpot_pool
+--         UPDATE %s
 --         SET
 --             %s = %d,
 --             update_time = %d
 --         WHERE game_id = %d
 --     ]],
+--         TABLE,
 --         field,
 --         amount,
 --         os.time(),
 --         game_id
 --     )
-
+--
 --     return db.query(sql)
 -- end
 

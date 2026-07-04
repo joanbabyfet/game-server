@@ -4,6 +4,7 @@ local json = require "json"
 local util = require "common.util"
 local wallet_logic = require "logic.wallet"
 local jackpot_logic = require "logic.jackpot"
+local rtp_logic = require "logic.rtp"
 
 -- 自动测试用
 local CMD = {}
@@ -161,6 +162,22 @@ local function test_spin(uid, agent_id, game_id, bet, count)
         count,
         total_win
     ))
+
+    -- 打印 RTP
+    local stat = rtp_logic.info(game_id)
+
+    local rtp = 0
+    if stat.bet > 0 then
+        rtp = stat.win / stat.bet * 100
+    end
+
+    skynet.error(string.format(
+        "[RTP] spin=%d bet=%.2f win=%.2f rtp=%.4f%%",
+        stat.spin,
+        util.to_amount(stat.bet),
+        util.to_amount(stat.win),
+        rtp
+    ))
 end
 
 -- 测试Wallet
@@ -217,7 +234,7 @@ function CMD.run()
     local user = test_login()
 
     -- 连续测试100次 Spin
-    test_spin(user.uid, user.agent_id, game_id, 10, 100)
+    test_spin(user.uid, user.agent_id, game_id, 10, 10000)
 
     test_wallet(user.uid)
 

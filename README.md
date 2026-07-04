@@ -11,6 +11,7 @@
 * RTP 统计（Redis 主存 + MySQL 定时同步）
 * Risk Control 风控系统（最大倍率、单局封顶，支持 Agent / Player 扩展）
 * Wallet 钱包（Redis）
+* Rollback（注单回滚）
 * Config Manager 配置中心
 * Request ID 幂等控制
 * Round / 注单 管理
@@ -37,7 +38,7 @@ logic/      游戏逻辑 (暂不公开)
 model/      数据模型
 service/    服务模块
 common/     公共组件
-sql/        初始化 SQL 文件
+sql/        初始化SQL文件 (暂不公开)
 ```
 
 ## 快速启动

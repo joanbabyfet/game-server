@@ -1,10 +1,10 @@
-local CODE = require "common.code"
+local CONSTANT = require "common.constant"
 
 local M = {}
 
 function M.success(data, msg)
     return {
-        code = CODE.SUCCESS,
+        code = CONSTANT.ERROR.SUCCESS,
         msg = msg or "success",
         timestamp = os.time(),
         data = data
@@ -13,7 +13,7 @@ end
 
 function M.error(code, msg)
     return {
-        code = code or -1,
+        code = code or CONSTANT.ERROR.FAIL,
         msg = msg or "error",
         timestamp = os.time(),
         data = nil,

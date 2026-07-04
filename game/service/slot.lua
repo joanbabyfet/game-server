@@ -13,9 +13,6 @@ function CMD.spin(uid, agent_id, game_id, bet)
         return response.error(err.code, err.msg)
     end
 
-    -- 删除内部字段，不返回给客户端
-    data._internal = nil
-
     return response.success(data)
 end
 
@@ -27,9 +24,6 @@ function CMD.play_free_spin(uid, free_spin_id, request_id)
     if err then
         return response.error(err.code, err.msg)
     end
-
-    -- 删除内部字段，不返回给客户端
-    data._internal = nil
 
     return response.success(data)
 end

@@ -3,11 +3,24 @@ local mysql = require "skynet.db.mysql"
 
 local M = {}
 
+local TABLE = "wallet_log"
+
+-- 钱包流水类型
+M.TYPE = {
+    BET      = "BET",
+    WIN      = "WIN",
+    BONUS    = "BONUS",
+    JACKPOT  = "JACKPOT",
+    DEPOSIT  = "DEPOSIT",
+    WITHDRAW = "WITHDRAW",
+    ROLLBACK = "ROLLBACK",
+}
+
 -- 写入钱包流水
 function M.create(data)
 
     local sql = string.format([[
-        INSERT INTO wallet_log(
+        INSERT INTO %s(
             uid,
             agent_id,
             game_id,
@@ -30,6 +43,7 @@ function M.create(data)
             %d
         )
     ]],
+        TABLE,
         data.uid or 0,
         data.agent_id or 0,
         data.game_id or 0,

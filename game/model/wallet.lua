@@ -2,22 +2,29 @@ local db = require "common.mysql"
 
 local M = {}
 
+local TABLE = "wallet"
+
 -- 获取钱包余额
 function M.get(uid)
+
     local sql = string.format([[
         SELECT *
-        FROM wallet
+        FROM %s
         WHERE uid = %d
         LIMIT 1
-    ]], uid)
+    ]],
+        TABLE,
+        uid
+    )
 
     return db.get_one(sql)
 end
 
 -- 创建用户钱包, 测试先给余额 10000
 function M.create(uid, balance)
+
     local sql = string.format([[
-        INSERT INTO wallet(
+        INSERT INTO %s(
             uid,
             balance,
             freeze_balance,
@@ -30,6 +37,7 @@ function M.create(uid, balance)
             %d
         )
     ]],
+        TABLE,
         uid,
         balance,
         os.time()
@@ -40,13 +48,15 @@ end
 
 -- 充值
 function M.add(uid, amount)
+
     local sql = string.format([[
-        UPDATE wallet
+        UPDATE %s
         SET
             balance = balance + %d,
             update_time = %d
         WHERE uid = %d
     ]],
+        TABLE,
         amount,
         os.time(),
         uid
@@ -57,14 +67,16 @@ end
 
 -- 扣款
 function M.sub(uid, amount)
+
     -- 防止并发超扣问题
     local sql = string.format([[
-        UPDATE wallet
+        UPDATE %s
         SET
             balance = balance - %d,
             update_time = %d
         WHERE uid = %d AND balance >= %d
     ]],
+        TABLE,
         amount,
         os.time(),
         uid,
@@ -84,10 +96,11 @@ function M.exists(uid)
 
     local sql = string.format([[
         SELECT 1
-        FROM wallet
+        FROM %s
         WHERE uid=%d
         LIMIT 1
     ]],
+        TABLE,
         uid
     )
 

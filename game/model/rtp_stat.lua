@@ -2,12 +2,14 @@ local db = require "common.mysql"
 
 local M = {}
 
+local TABLE = "rtp_stat"
+
 function M.update(data)
 
     local now = os.time()
 
     local sql = string.format([[
-        INSERT INTO rtp_stat(
+        INSERT INTO %s(
             game_id,
             total_spin,
             total_bet,
@@ -33,6 +35,7 @@ function M.update(data)
 
         update_time = VALUES(update_time)
     ]],
+        TABLE,
         data.game_id,
         data.total_spin,
         data.total_bet,

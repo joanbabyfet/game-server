@@ -4,11 +4,20 @@ local json = require "json"
 
 local M = {}
 
+local TABLE = "game_order"
+
+-- 注单状态
+M.STATUS = {
+    PROCESSING = 0, -- 处理中
+    SETTLED    = 1, -- 已结算
+    ROLLBACK   = 2, -- 已回滚
+}
+
 -- 创建注单
 function M.create(data)
 
     local sql = string.format([[
-        INSERT INTO `game_order`(
+        INSERT INTO `%s`(
             request_id,
             order_no,
             round_id,
@@ -53,6 +62,7 @@ function M.create(data)
             %d
         )
     ]],
+        TABLE,
         mysql.quote_sql_str(data.request_id),
         mysql.quote_sql_str(data.order_no),
         mysql.quote_sql_str(data.round_id),
@@ -74,7 +84,7 @@ function M.create(data)
         data.settle_time,
         data.create_time
     )
-    
+
     return db.query(sql)
 end
 
@@ -83,12 +93,53 @@ function M.get_by_request_id(request_id)
 
     local sql = string.format([[
         SELECT *
-        FROM `game_order`
-        WHERE request_id= %s
+        FROM `%s`
+        WHERE request_id = %s
         LIMIT 1
-    ]], mysql.quote_sql_str(request_id))
+    ]],
+        TABLE,
+        mysql.quote_sql_str(request_id)
+    )
 
     return db.get_one(sql)
+end
+
+-- 根据订单号获取订单
+function M.get_by_order_no(order_no)
+
+    local sql = string.format([[
+        SELECT *
+        FROM `%s`
+        WHERE order_no = %s
+        LIMIT 1
+    ]],
+        TABLE,
+        mysql.quote_sql_str(order_no)
+    )
+
+    return db.get_one(sql)
+end
+
+-- 更新订单为已回滚 (只有已结算才能回滚)
+function M.rollback(order_no)
+
+    local sql = string.format([[
+        UPDATE `%s`
+        SET
+            status = %d
+        WHERE
+            order_no = %s
+        AND
+            status = %d
+        LIMIT 1
+    ]],
+        TABLE,
+        M.STATUS.ROLLBACK,
+        mysql.quote_sql_str(order_no),
+        M.STATUS.SETTLED
+    )
+
+    return db.query(sql)
 end
 
 return M

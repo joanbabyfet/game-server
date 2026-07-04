@@ -44,6 +44,6 @@ skynet.start(function()
 
     end)
 
-     -- 向 launcher 注册服务
+    -- 向 launcher 注册服务
     skynet.register(".game_mgr")
 end)

@@ -1,33 +1,55 @@
 local M = {}
 
--- 订单状态
-M.ORDER_STATUS = {
-    PROCESSING = 0, -- 处理中
-    SETTLED    = 1, -- 已结算
-    ROLLBACK   = 2, -- 已回滚
-}
+-- 统一管理错误码
+M.ERROR = {
+    SUCCESS              = 0,
 
--- 钱包流水类型
-M.WALLET_LOG_TYPE = {
-    BET      = "BET",
-    WIN      = "WIN",
-    BONUS    = "BONUS",
-    JACKPOT  = "JACKPOT",
-    DEPOSIT  = "DEPOSIT",
-    WITHDRAW = "WITHDRAW",
-}
+    -- 通用
+    FAIL                 = -1,
+    PARAM_ERROR          = -2,
+    COMMIT_FAILED        = -3,
 
--- 游戏状态
-M.GAME_STATUS = {
-    OFFLINE = 0,
-    ONLINE  = 1,
-}
+    -- 用户
+    USER_NOT_FOUND      = -1001,
+    USER_CREATE_FAILED  = -1002,
 
--- Free Spin 状态
-M.FREE_SPIN_STATUS = {
-    RUNNING = 0, -- 进行中
-    FINISHED = 1, -- 已完成
-    CANCELED = 2, -- 已取消
+    -- 钱包
+    INSUFFICIENT_BALANCE        = -1002,
+    WALLET_NOT_FOUND            = -1003,
+    WALLET_ADD_FAILED           = -1004,
+    WALLET_LOG_CREATE_FAILED    = -1005,
+
+    -- 游戏
+    INVALID_BET             = -2001,
+    GAME_NOT_FOUND          = -2002,
+    GAME_CONFIG_NOT_FOUND   = -2003,
+    AGENT_GAME_NOT_FOUND    = -2004,
+    SYMBOL_MAP_NOT_FOUND    = -2005,
+    BET_TOO_SMALL           = -2006,
+    BET_TOO_LARGE           = -2007,
+
+    -- Free Spin
+    FREE_SPIN_NOT_FOUND      = -3001,
+    FREE_SPIN_OWNER_ERROR    = -3002,
+    FREE_SPIN_FINISH_FAILED  = -3003,
+    FREE_SPIN_UPDATE_FAILED  = -3004,
+    FREE_SPIN_CREATE_FAILED  = -3005,
+    FREE_SPIN_FINISHED       = -3006,
+
+    -- Order
+    ORDER_NOT_FOUND      = -4001,
+    ORDER_STATUS_ERROR   = -4002,
+    ORDER_CREATE_FAILED  = -4003,
+    ORDER_UPDATE_FAILED  = -4004,
+    ORDER_ROLLBACK_FAILED= -4005,
+
+    -- Jackpot
+    JACKPOT_ADD_FAILED      = -5001,
+    JACKPOT_POOL_NOT_FOUND  = -5002,
+    JACKPOT_AMOUNT_INVALID  = -5003,
+
+    -- 系统
+    SYSTEM_ERROR         = -9999,
 }
 
 return M

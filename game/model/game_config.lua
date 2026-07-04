@@ -2,14 +2,18 @@ local db = require "common.mysql"
 
 local M = {}
 
+local TABLE = "game_config"
+
 function M.get_all()
 
-    local sql = [[
+    local sql = string.format([[
         SELECT *
-        FROM game_config
+        FROM %s
         WHERE status = 1
         ORDER BY game_id,id
-    ]]
+    ]],
+        TABLE
+    )
 
     return db.query(sql)
 
@@ -19,11 +23,12 @@ function M.get_by_game(game_id)
 
     local sql = string.format([[
         SELECT *
-        FROM game_config
+        FROM %s
         WHERE game_id = %d
         AND status = 1
         ORDER BY id
     ]],
+        TABLE,
         game_id
     )
 

@@ -1,16 +1,22 @@
 local db = require "common.mysql"
 local mysql = require "skynet.db.mysql"
-local CONSTANT = require "common.constant"
 
 local M = {}
 
 local TABLE = "free_spin"
 
+-- Free Spin 状态
+M.STATUS = {
+    RUNNING = 0, -- 进行中
+    FINISHED = 1, -- 已完成
+    CANCELED = 2, -- 已取消
+}
+
 -- 创建 Free Spin 批次
 function M.create(data)
 
     local sql = string.format([[
-        INSERT INTO free_spin(
+        INSERT INTO %s(
             free_spin_id,
             uid,
             agent_id,
@@ -39,6 +45,7 @@ function M.create(data)
             %d
         )
     ]],
+        TABLE,
         mysql.quote_sql_str(data.free_spin_id),
         data.uid,
         data.agent_id,
@@ -77,10 +84,11 @@ function M.get_by_trigger_order_no(order_no)
 
     local sql = string.format([[
         SELECT *
-        FROM free_spin
+        FROM %s
         WHERE trigger_order_no = %s
         LIMIT 1
     ]],
+        TABLE,
         mysql.quote_sql_str(order_no)
     )
 
@@ -146,7 +154,7 @@ function M.finish(free_spin_id)
         WHERE free_spin_id = %s
     ]],
         TABLE,
-        CONSTANT.FREE_SPIN_STATUS.FINISHED,
+        M.STATUS.FINISHED,
         now,
         mysql.quote_sql_str(free_spin_id)
     )

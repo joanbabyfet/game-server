@@ -3,10 +3,13 @@ local mysql = require "skynet.db.mysql"
 
 local M = {}
 
+local TABLE = "jackpot_log"
+
 -- 创建Jackpot中奖记录
 function M.create(data)
+
     local sql = string.format([[
-        INSERT INTO jackpot_log(
+        INSERT INTO %s(
             uid,
             game_id,
             jackpot_type,
@@ -21,6 +24,7 @@ function M.create(data)
             %d
         )
     ]],
+        TABLE,
         data.uid,
         data.game_id,
         mysql.quote_sql_str(data.jackpot_type),

@@ -4,22 +4,30 @@ local mysql = require "skynet.db.mysql"
 -- 创建一个空 Table, M为模块
 local M = {}
 
+local TABLE = "user"
+
 -- 获取用户信息, 给 Table 增加函数
 function M.get(uid)
+
     local sql = string.format([[
         SELECT *
-        FROM user
+        FROM %s
         WHERE uid = %d
         LIMIT 1
-    ]], uid)
+    ]],
+        TABLE,
+        uid
+    )
 
     return db.get_one(sql)
 end
 
 -- 根据用户名获取用户信息
 function M.get_by_username(username)
+
     local sql = string.format(
-        "SELECT * FROM user WHERE username = %s LIMIT 1",
+        "SELECT * FROM %s WHERE username = %s LIMIT 1",
+        TABLE,
         mysql.quote_sql_str(username)
     )
 
@@ -28,8 +36,9 @@ end
 
 -- 创建用户
 function M.create(username, nickname)
+
     local sql = string.format([[
-        INSERT INTO user(
+        INSERT INTO %s(
             username,
             nickname,
             status,
@@ -42,11 +51,12 @@ function M.create(username, nickname)
             %d
         )
     ]],
+        TABLE,
         mysql.quote_sql_str(username),
         mysql.quote_sql_str(nickname),
         os.time()
     )
-    
+
     local ret = db.query(sql)
     if not ret then
         return nil
