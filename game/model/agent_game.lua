@@ -4,6 +4,17 @@ local M = {}
 
 local TABLE = "agent_game"
 
+function M.list()
+
+    local sql = string.format([[
+        SELECT *
+        FROM %s
+    ]], TABLE)
+
+    return db.query(sql)
+
+end
+
 -- 获取 Agent 游戏配置 (如果代理把某个游戏关闭, 获取不到数据)
 function M.get(agent_id, game_id)
 

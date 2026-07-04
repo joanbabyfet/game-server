@@ -3,12 +3,15 @@ require "skynet.manager" -- 加载此模块后才能调用 skynet.register
 local json = require "json"
 local game_config_model = require "model.game_config"
 local game_model = require "model.game"
+local agent_game_model = require "model.agent_game"
+
+local CMD = {}
 
 local CONFIG = {}
 
-local VERSION = 0
+local AGENT_GAME = {}
 
-local CMD = {}
+local VERSION = 0
 
 -- 构建 Symbol Map
 local function build_symbol_map(game_cfg)
@@ -114,6 +117,28 @@ local function load_game(game_id)
     ))
 end
 
+local function load_agent_game()
+
+    AGENT_GAME = {}
+
+    local list = agent_game_model.list()
+
+    for _, v in ipairs(list) do
+
+        if not AGENT_GAME[v.agent_id] then
+            AGENT_GAME[v.agent_id] = {}
+        end
+
+        AGENT_GAME[v.agent_id][v.game_id] = v
+
+    end
+
+    skynet.error(string.format(
+        "[CONFIG] load agent_game=%d",
+        #list
+    ))
+end
+
 -- 获取某个游戏配置
 function CMD.get_game(game_id)
 
@@ -166,6 +191,23 @@ function CMD.reload_game(game_id)
 
 end
 
+function CMD.get_agent_game(agent_id, game_id)
+
+    local agent = AGENT_GAME[agent_id]
+    if not agent then
+        return nil
+    end
+
+    return agent[game_id]
+end
+
+function CMD.reload_agent_game()
+
+    load_agent_game()
+
+    return true
+end
+
 -- 健康检查(对外接口, 可以被其它 Service 调用)
 function CMD.ping()
     return "pong"
@@ -173,8 +215,10 @@ end
 
 -- config_mgr 本身就是一个常驻 Service
 skynet.start(function()
-
+    
     load_all()
+
+    load_agent_game()
 
     -- 注册 Lua 消息处理函数
     skynet.dispatch("lua", function(session, source, cmd, ...)
