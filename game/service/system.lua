@@ -1,43 +1,29 @@
 local skynet = require "skynet"
 require "skynet.manager"
-local wallet_logic = require "logic.wallet"
 local constant = require "common.constant"
 
 local CMD = {}
 
--- 注单回滚
---
--- req = {
---     request_id = "",
---     order_no   = "",
---     uid        = 10001,
---     agent_id   = 1,
--- }
-function CMD.rollback(data)
-
-    local balance, err = wallet_logic.rollback(data)
-
-    if err then
-        return nil, err
-    end
-
+-- 健康检查(对外接口, 可以被其它 Service 调用)
+function CMD.ping(req)
     return {
-        balance = balance,
+        msg = "pong",
+        timestamp = os.time(),
     }
 end
 
--- 对外提供服务入口
+-- 对外提供系统级rpc服务入口
 skynet.start(function()
 
-    skynet.error("[ROLLBACK] start")
+    skynet.error("[SYSTEM] start")
 
     skynet.dispatch("lua", function(session, source, cmd, ...)
 
         local f = CMD[cmd]
-        
+
         if not f then
             skynet.error(string.format(
-                "[ROLLBACK] unknown cmd=%s source=%08x",
+                "[SYSTEM] unknown cmd=%s source=%08x",
                 tostring(cmd),
                 source
             ))
@@ -55,6 +41,6 @@ skynet.start(function()
     end)
 
     -- 注册服务
-    skynet.register(".rollback")
+    skynet.register(".system")
 
 end)

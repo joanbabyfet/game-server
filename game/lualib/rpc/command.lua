@@ -1,0 +1,14 @@
+local M = {}
+
+-- User
+M.CMD_AUTHENTICATE = 1001
+
+-- Wallet
+M.CMD_BALANCE = 1002
+M.CMD_BET = 1003
+M.CMD_ROLLBACK = 1004
+M.CMD_KICK = 1005
+
+M.CMD_PING = 9999
+
+return M

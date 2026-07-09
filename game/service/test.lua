@@ -5,14 +5,18 @@ local util = require "common.util"
 local wallet_logic = require "logic.wallet"
 local jackpot_logic = require "logic.jackpot"
 local rtp_logic = require "logic.rtp"
+local constant = require "common.constant"
 
 -- 自动测试用
 local CMD = {}
 
+local config_mgr
+local login
+local slot
+local rollback
+
 -- 测试Config
 local function test_config()
-
-    local config_mgr = skynet.localname(".config_mgr")
 
     local version = skynet.call(config_mgr, "lua", "version")
 
@@ -43,8 +47,6 @@ end
 -- 测试Reload
 local function test_reload()
 
-    local config_mgr = skynet.localname(".config_mgr")
-
     skynet.call(config_mgr, "lua", "reload")
 
     local version = skynet.call(config_mgr, "lua", "version")
@@ -64,16 +66,14 @@ end
 
 -- 测试Login
 local function test_login()
-
-    local login = skynet.localname(".login")
     
-    local ret = skynet.call(login, "lua", "login", "chris")
+    local user, err = skynet.call(login, "lua", "login", "chris")
 
-    assert(ret.code == 0, ret.msg)
+    assert(user, err and err.msg)
 
-    skynet.error("[TEST][LOGIN] uid =", ret.data)
+    skynet.error("[TEST][LOGIN] uid =", user.uid)
 
-    return ret.data
+    return user
 
 end
 
@@ -84,14 +84,12 @@ local function test_spin(uid, agent_id, game_id, bet, count)
     bet = bet or 1000
     count = count or 1
 
-    local slot = skynet.localname(".slot")
-
     local total_win = 0
 
     for i = 1, count do
         -- 普通 Spin
         local request_id = util.uuid()
-        local ret = skynet.call(
+        local ret, err = skynet.call(
             slot,
             "lua",
             "spin",
@@ -102,22 +100,22 @@ local function test_spin(uid, agent_id, game_id, bet, count)
             request_id
         )
 
-        assert(ret.code == 0, ret.msg)
+        assert(ret, err and err.msg)
 
-        total_win = total_win + ret.data.win_amount
+        total_win = total_win + ret.win_amount
 
         skynet.error(string.format(
             "[TEST][SPIN] %d/%d request=%s order=%s win=%.2f balance=%.2f",
             i,
             count,
             request_id,
-            ret.data.order_no,
-            ret.data.win_amount,
-            ret.data.balance
+            ret.order_no,
+            ret.win_amount,
+            ret.balance
         ))
 
         -- Trigger Free Spin 
-        local fs = ret.data.free_spin
+        local fs = ret.free_spin
         if fs and fs.trigger then
             -- 写入日志
             skynet.error(string.format(
@@ -129,7 +127,7 @@ local function test_spin(uid, agent_id, game_id, bet, count)
             local free_spin_id = fs.free_spin_id
             while fs.remain_count > 0 do
                 local free_request_id = util.uuid()
-                local free_ret = skynet.call(
+                local free_ret, err = skynet.call(
                     slot,
                     "lua",
                     "play_free_spin",
@@ -140,18 +138,18 @@ local function test_spin(uid, agent_id, game_id, bet, count)
                     free_request_id
                 )
 
-                assert(free_ret.code == 0, free_ret.msg)
+                assert(free_ret, err and err.msg)
 
-                total_win = total_win + free_ret.data.win_amount
+                total_win = total_win + free_ret.win_amount
 
-                fs = free_ret.data.free_spin
+                fs = free_ret.free_spin
 
                 skynet.error(string.format(
                     "[TEST][FREE_SPIN] request=%s remain=%d win=%.2f balance=%.2f",
                     free_request_id,
                     fs.remain_count,
-                    free_ret.data.win_amount,
-                    free_ret.data.balance
+                    free_ret.win_amount,
+                    free_ret.balance
                 ))
             end
 
@@ -185,11 +183,8 @@ end
 -- 测试Rollback
 local function test_rollback(uid, agent_id, game_id)
 
-    local slot = skynet.localname(".slot")
-    local rollback = skynet.localname(".rollback")
-
     -- 先打一局
-    local ret = skynet.call(
+    local ret, err = skynet.call(
         slot,
         "lua",
         "spin",
@@ -200,49 +195,49 @@ local function test_rollback(uid, agent_id, game_id)
         util.uuid()
     )
 
-    assert(ret.code == 0, ret.msg)
+    assert(ret, err and err.msg)
 
     skynet.error(string.format(
         "[TEST][ROLLBACK] spin order=%s balance=%.2f",
-        ret.data.order_no,
-        ret.data.balance
+        ret.order_no,
+        ret.balance
     ))
 
     -- 回滚
-    local rb = skynet.call(
+    local rb, err = skynet.call(
         rollback,
         "lua",
         "rollback",
         {
             request_id = util.uuid(),
-            order_no = ret.data.order_no,
+            order_no = ret.order_no,
             reason = "Provider Timeout"
         }
     )
 
-    assert(rb.code == 0, rb.msg)
+    assert(rb, err and err.msg)
 
     skynet.error(string.format(
         "[TEST][ROLLBACK] success balance=%.2f",
-        rb.data.balance
+        rb.balance
     ))
 
     -- 再回滚一次（测试幂等）
-    rb = skynet.call(
+    rb, err = skynet.call(
         rollback,
         "lua",
         "rollback",
         {
             request_id = util.uuid(),
-            order_no = ret.data.order_no,
+            order_no = ret.order_no,
         }
     )
 
-    assert(rb.code == 0, rb.msg)
+    assert(rb, err and err.msg)
 
     skynet.error(string.format(
         "[TEST][ROLLBACK] idempotent balance=%.2f",
-        rb.data.balance
+        rb.balance
     ))
 
 end
@@ -292,6 +287,11 @@ end
 -- Run
 function CMD.run()
 
+    config_mgr = skynet.localname(".config_mgr")
+    login = skynet.localname(".login")
+    slot = skynet.localname(".slot")
+    rollback = skynet.localname(".rollback")
+
     local game_id = 1
 
     test_config()
@@ -326,7 +326,20 @@ skynet.start(function()
 
         local f = CMD[cmd]
 
-        assert(f, "unknown cmd : " .. tostring(cmd))
+        if not f then
+            skynet.error(string.format(
+                "[TEST] unknown cmd=%s source=%08x",
+                tostring(cmd),
+                source
+            ))
+
+            skynet.retpack(nil, {
+                code = constant.ERROR.RPC_UNKNOWN_CMD,
+                msg = "unknown cmd",
+            })
+
+            return
+        end
         
         skynet.retpack(
             f(...)

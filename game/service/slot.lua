@@ -1,7 +1,7 @@
 local skynet = require "skynet"
 require "skynet.manager" -- 加载此模块后才能调用 skynet.register
 local slot_logic = require "logic.slot"
-local response = require "common.response"
+local constant = require "common.constant"
 
 local CMD = {}
 
@@ -18,25 +18,34 @@ function CMD.spin(uid, agent_id, game_id, bet)
     )
 
     if not cfg then
-        return response.error(-2002, "game not found")
+        return nil, {
+            code = constant.ERROR.GAME_NOT_FOUND,
+            msg = "game not found",
+        }
     end
 
     if cfg.status ~= 1 then
-        return response.error(-2008, "game disabled")
+        return nil, {
+            code = constant.ERROR.GAME_DISABLED,
+            msg = "game disabled",
+        }
     end
 
     if cfg.maintenance == 1 then
-        return response.error(-2009, cfg.maintenance_msg)
+        return nil, {
+            code = constant.ERROR.GAME_MAINTENANCE,
+            msg = cfg.maintenance_msg,
+        }
     end
 
     -- 进入游戏逻辑
     local data, err = slot_logic.spin(uid, agent_id, game_id, bet)
 
     if err then
-        return response.error(err.code, err.msg)
+        return nil, err
     end
 
-    return response.success(data)
+    return data
 end
 
 -- Free Spin
@@ -51,25 +60,34 @@ function CMD.play_free_spin(uid, agent_id, game_id, free_spin_id, request_id)
     )
 
     if not cfg then
-        return response.error(-2002, "game not found")
+        return nil, {
+            code = constant.ERROR.GAME_NOT_FOUND,
+            msg = "game not found",
+        }
     end
 
     if cfg.status ~= 1 then
-        return response.error(-2008, "game disabled")
+        return nil, {
+            code = constant.ERROR.GAME_DISABLED,
+            msg = "game disabled",
+        }
     end
 
     if cfg.maintenance == 1 then
-        return response.error(-2009, cfg.maintenance_msg)
+        return nil, {
+            code = constant.ERROR.GAME_MAINTENANCE,
+            msg = cfg.maintenance_msg,
+        }
     end
 
     -- 进入游戏逻辑
     local data, err = slot_logic.play_free_spin(uid, agent_id, game_id, free_spin_id, request_id)
 
     if err then
-        return response.error(err.code, err.msg)
+        return nil, err
     end
 
-    return response.success(data)
+    return data
 end
 
 skynet.start(function()
@@ -80,7 +98,20 @@ skynet.start(function()
 
         local f = CMD[cmd]
 
-        assert(f, "unknown cmd : " .. tostring(cmd))
+        if not f then
+            skynet.error(string.format(
+                "[SLOT] unknown cmd=%s source=%08x",
+                tostring(cmd),
+                source
+            ))
+
+            skynet.retpack(nil, {
+                code = constant.ERROR.RPC_UNKNOWN_CMD,
+                msg = "unknown cmd",
+            })
+
+            return
+        end
         
         skynet.retpack(
             f(...)

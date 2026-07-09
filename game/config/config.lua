@@ -17,6 +17,8 @@ luaservice = "./service/?.lua;" .. root .. "service/?.lua"
 lua_path =
     "./?.lua;"
     .. "./?/init.lua;"
+    .. "./lualib/?.lua;"
+    .. "./lualib/?/init.lua;"
     .. root .. "lualib/?.lua;"
     .. root .. "lualib/?/init.lua"
 
@@ -29,3 +31,11 @@ cpath = root .. "cservice/?.so"
 logger = nil
 
 debug = false
+
+rpc_host = "0.0.0.0"
+
+rpc_port = 8888
+
+debug_host = "0.0.0.0"
+
+debug_port = 8000

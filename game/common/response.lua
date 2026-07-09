@@ -1,5 +1,6 @@
 local CONSTANT = require "common.constant"
 
+-- 这是给 Provider API（HTTP）用的，而不是 Skynet Service 之间调用用的
 local M = {}
 
 function M.success(data, msg)

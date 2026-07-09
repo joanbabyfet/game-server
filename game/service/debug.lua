@@ -1,6 +1,7 @@
 local skynet = require "skynet"
 require "skynet.manager"
 local json = require "json"
+local constant = require "common.constant"
 
 -- 开发调试用
 local CMD = {}
@@ -74,7 +75,7 @@ end
 -- Login
 function CMD.login(account)
 
-    local login = skynet.queryservice(".login")
+    local login = skynet.localname(".login")
 
     return skynet.call(
         login,
@@ -88,7 +89,7 @@ end
 -- Slot
 function CMD.spin(uid, agent_id, game_id, bet)
 
-    local slot = skynet.queryservice(".slot")
+    local slot = skynet.localname(".slot")
 
     return skynet.call(
         slot,
@@ -105,7 +106,7 @@ end
 -- Wallet
 function CMD.wallet(uid)
 
-    local wallet = skynet.queryservice(".wallet")
+    local wallet = skynet.localname(".wallet")
 
     return skynet.call(
         wallet,
@@ -119,7 +120,7 @@ end
 -- Jackpot
 function CMD.jackpot(game_id)
 
-    local jackpot = skynet.queryservice(".jackpot")
+    local jackpot = skynet.localname(".jackpot")
 
     return skynet.call(
         jackpot,
@@ -133,7 +134,7 @@ end
 -- RTP
 function CMD.rtp(game_id)
 
-    local rtp = skynet.queryservice(".rtp")
+    local rtp = skynet.localname(".rtp")
 
     return skynet.call(
         rtp,
@@ -153,7 +154,20 @@ skynet.start(function()
 
         local f = CMD[cmd]
 
-        assert(f, "unknown cmd : " .. tostring(cmd))
+        if not f then
+            skynet.error(string.format(
+                "[DEBUG] unknown cmd=%s source=%08x",
+                tostring(cmd),
+                source
+            ))
+
+            skynet.retpack(nil, {
+                code = constant.ERROR.RPC_UNKNOWN_CMD,
+                msg = "unknown cmd",
+            })
+
+            return
+        end
 
         skynet.retpack(
             f(...)

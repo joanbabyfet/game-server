@@ -5,6 +5,8 @@
 ## 项目特点
 
 * 基于 Skynet 的高并发 Slot 游戏服务器
+* Go Provider API（Gin）+ Skynet 双服务架构
+* 自研 TCP + Protobuf RPC（支持 Request / Response / Error Packet）
 * Reel Strip + Payline 数学模型
 * Wild、Scatter、Free Spin 支持
 * Jackpot 奖池（Redis 主存 + MySQL 定时同步）
@@ -13,6 +15,7 @@
 * Wallet 钱包（Redis）
 * Rollback（注单回滚）
 * Config Manager 配置中心
+* Player Manager 在线玩家管理
 * Request ID 幂等控制
 * Round / 注单 管理
 * Snowflake 全局唯一 ID

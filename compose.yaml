@@ -8,6 +8,8 @@ services:
     volumes:
       - ./skynet:/app/skynet
       - ./game:/app/game
+      - ./third_party:/app/third_party
+      - ./proto:/app/proto
     tty: true
     stdin_open: true
     depends_on: 

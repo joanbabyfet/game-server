@@ -4,6 +4,7 @@ local json = require "json"
 local game_config_model = require "model.game_config"
 local game_model = require "model.game"
 local agent_game_model = require "model.agent_game"
+local constant = require "common.constant"
 
 local CMD = {}
 
@@ -208,14 +209,11 @@ function CMD.reload_agent_game()
     return true
 end
 
--- 健康检查(对外接口, 可以被其它 Service 调用)
-function CMD.ping()
-    return "pong"
-end
-
 -- config_mgr 本身就是一个常驻 Service
 skynet.start(function()
-    
+
+    skynet.error("[CONFIG_MGR] start")
+
     load_all()
 
     load_agent_game()
@@ -225,7 +223,20 @@ skynet.start(function()
 
         local f = CMD[cmd]
 
-        assert(f, cmd)
+        if not f then
+            skynet.error(string.format(
+                "[CONFIG_MGR] unknown cmd=%s source=%08x",
+                tostring(cmd),
+                source
+            ))
+
+            skynet.retpack(nil, {
+                code = constant.ERROR.RPC_UNKNOWN_CMD,
+                msg = "unknown cmd",
+            })
+
+            return
+        end
 
         skynet.retpack(
             f(...)

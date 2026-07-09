@@ -58,6 +58,9 @@ M.ERROR = {
     JACKPOT_TYPE_INVALID        = -5007,
     JACKPOT_LOG_CREATE_FAILED   = -5008,
 
+    -- RPC
+    RPC_UNKNOWN_CMD             = -9001,
+
     -- 系统
     SYSTEM_ERROR                = -9999,
 }

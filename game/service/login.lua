@@ -1,7 +1,7 @@
 local skynet = require "skynet"
 require "skynet.manager" -- 加载此模块后才能调用 skynet.register
 local login_logic = require "logic.login"
-local response = require "common.response"
+local constant = require "common.constant"
 
 local CMD = {}
 
@@ -10,10 +10,10 @@ function CMD.login(username)
     local user, err = login_logic.login(username)
 
     if err then
-        return response.error(err.code, err.msg)
+        return nil, err
     end
 
-    return response.success(user)
+    return user
 end
 
 skynet.start(function()
@@ -24,7 +24,20 @@ skynet.start(function()
 
         local f = CMD[cmd]
 
-        assert(f, "unknown cmd : " .. tostring(cmd))
+        if not f then
+            skynet.error(string.format(
+                "[LOGIN] unknown cmd=%s source=%08x",
+                tostring(cmd),
+                source
+            ))
+
+            skynet.retpack(nil, {
+                code = constant.ERROR.RPC_UNKNOWN_CMD,
+                msg = "unknown cmd",
+            })
+
+            return
+        end
 
         skynet.retpack(
             f(...)
