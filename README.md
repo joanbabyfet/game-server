@@ -6,7 +6,7 @@
 
 * 基于 Skynet 的高并发 Slot 游戏服务器
 * Go Provider API（Gin）+ Skynet 双服务架构
-* 自研 TCP + Protobuf RPC（支持 Request / Response / Error Packet）
+* 自定义协议 TCP + Protobuf RPC（支持 Request / Response / Error Packet）
 * Reel Strip + Payline 数学模型
 * Wild、Scatter、Free Spin 支持
 * Jackpot 奖池（Redis 主存 + MySQL 定时同步）
