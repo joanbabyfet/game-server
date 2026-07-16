@@ -15,9 +15,8 @@ skynet.start(function()
     -- 在线玩家管理
     local player_mgr = skynet.uniqueservice("player_mgr")
     -- 业务服务
-    local login = skynet.newservice("login")
     local slot = skynet.newservice("slot")
-    local rollback = skynet.newservice("rollback")
+    local wallet = skynet.newservice("wallet")
     local debug = skynet.newservice("debug")
     -- 系统服务
     local system = skynet.uniqueservice("system")

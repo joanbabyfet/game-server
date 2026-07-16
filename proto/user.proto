@@ -5,28 +5,14 @@ package user;
 option go_package = "game-api/proto/userpb;userpb";
 
 //
-// Authenticate
+// Login
 //
 
-message AuthenticateReq {
-
-    // Provider JWT
-    string token = 1;
-
+message LoginReq {
+    uint64 uid = 1;
 }
 
-message AuthenticateResp {
-
-    uint64 uid = 1;
-
-    uint32 agent_id = 2;
-
-    string username = 3;
-
-    uint64 balance = 4;
-
-    string currency = 5;
-
+message LoginResp {
 }
 
 //

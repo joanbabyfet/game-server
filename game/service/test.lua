@@ -13,7 +13,7 @@ local CMD = {}
 local config_mgr
 local login
 local slot
-local rollback
+local wallet
 
 -- 测试Config
 local function test_config()
@@ -64,19 +64,6 @@ local function test_reload()
 
 end
 
--- 测试Login
-local function test_login()
-    
-    local user, err = skynet.call(login, "lua", "login", "chris")
-
-    assert(user, err and err.msg)
-
-    skynet.error("[TEST][LOGIN] uid =", user.uid)
-
-    return user
-
-end
-
 -- 测试 Spin + Free Spin
 local function test_spin(uid, agent_id, game_id, bet, count)
 
@@ -92,12 +79,15 @@ local function test_spin(uid, agent_id, game_id, bet, count)
         local ret, err = skynet.call(
             slot,
             "lua",
-            "spin",
-            uid,
-            agent_id,
-            game_id,
-            bet,
-            request_id
+            "bet",
+            "bet",
+            {
+                uid = uid,
+                agent_id = agent_id,
+                game_id = game_id,
+                bet = bet,
+                request_id = request_id,
+            }
         )
 
         assert(ret, err and err.msg)
@@ -187,12 +177,14 @@ local function test_rollback(uid, agent_id, game_id)
     local ret, err = skynet.call(
         slot,
         "lua",
-        "spin",
-        uid,
-        agent_id,
-        game_id,
-        10,
-        util.uuid()
+        "bet",
+        {
+            uid = uid,
+            agent_id = agent_id,
+            game_id = game_id,
+            bet = 10,
+            request_id = util.uuid(),
+        }
     )
 
     assert(ret, err and err.msg)
@@ -205,7 +197,7 @@ local function test_rollback(uid, agent_id, game_id)
 
     -- 回滚
     local rb, err = skynet.call(
-        rollback,
+        wallet,
         "lua",
         "rollback",
         {
@@ -224,7 +216,7 @@ local function test_rollback(uid, agent_id, game_id)
 
     -- 再回滚一次（测试幂等）
     rb, err = skynet.call(
-        rollback,
+        wallet,
         "lua",
         "rollback",
         {
@@ -245,13 +237,15 @@ end
 -- 测试Wallet
 local function test_wallet(uid)
 
-    local wallet, err = wallet_logic.info(uid)
+    local resp, err = wallet_logic.balance({
+        uid = uid,
+    })
 
-    assert(wallet, err and err.msg)
+    assert(resp, err and err.msg)
 
     skynet.error(
         "[TEST][WALLET] balance =",
-        util.to_amount(wallet.balance)
+        util.to_amount(resp.balance)
     )
 
 end
@@ -290,7 +284,7 @@ function CMD.run()
     config_mgr = skynet.localname(".config_mgr")
     login = skynet.localname(".login")
     slot = skynet.localname(".slot")
-    rollback = skynet.localname(".rollback")
+    wallet = skynet.localname(".wallet")
 
     local game_id = 1
 

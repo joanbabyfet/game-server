@@ -10,14 +10,15 @@ M.ERROR = {
     COMMIT_FAILED               = -3,
 
     -- 用户
-    USER_NOT_FOUND              = -1001,
-    USER_CREATE_FAILED          = -1002,
-
+    PLAYER_NOT_FOUND              = -1001,
+    PLAYER_CREATE_FAILED          = -1002,
+    PLAYER_ALREADY_ONLINE         = -1003,
+    PLAYER_NOT_ONLINE             = -1004,
     -- 钱包
-    INSUFFICIENT_BALANCE        = -1002,
-    WALLET_NOT_FOUND            = -1003,
-    WALLET_ADD_FAILED           = -1004,
-    WALLET_LOG_CREATE_FAILED    = -1005,
+    INSUFFICIENT_BALANCE        = -1005,
+    WALLET_NOT_FOUND            = -1006,
+    WALLET_ADD_FAILED           = -1007,
+    WALLET_LOG_CREATE_FAILED    = -1008,
 
     -- 游戏
     INVALID_BET                 = -2001,

@@ -6,10 +6,7 @@ local CMD = {}
 
 -- 健康检查(对外接口, 可以被其它 Service 调用)
 function CMD.ping(req)
-    return {
-        msg = "pong",
-        timestamp = os.time(),
-    }
+    return {}
 end
 
 -- 对外提供系统级rpc服务入口

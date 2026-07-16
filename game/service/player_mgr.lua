@@ -8,10 +8,17 @@ local players = {}
 local online_count = 0
 
 -- 玩家上线
-function CMD.online(uid)
-    -- 防止重复上线
-    if players[uid] then
-        return false, "already online"
+function CMD.online(data)
+
+    local uid = data.uid
+
+    local player = players[uid]
+
+    -- 防止重复上线, 已在线，覆盖 旧数据
+    if player then
+        player.login_time = skynet.time()
+
+        return {}
     end
 
     players[uid] = {
@@ -21,34 +28,47 @@ function CMD.online(uid)
 
     online_count = online_count + 1
 
-    return true
+    return {}
 end
 
 -- 玩家下线
 function CMD.offline(uid)
 
     if not players[uid] then
-        return false, "player not online"
+        return nil, {
+            code = constant.ERROR.PLAYER_NOT_ONLINE,
+            msg = "player not online",
+        }
     end
 
     players[uid] = nil
 
     online_count = online_count - 1
 
-    return true
+    return {}
 end
 
 -- 是否在线
 function CMD.is_online(uid)
 
-    return players[uid] ~= nil
+   return {
+        online = players[uid] ~= nil,
+    }
 
 end
 
 -- 获取玩家
 function CMD.get(uid)
 
-    return players[uid]
+    local player = players[uid]
+    if not player then
+        return nil, {
+            code = constant.ERROR.PLAYER_NOT_ONLINE,
+            msg = "player not online",
+        }
+    end
+
+    return player
 
 end
 
@@ -60,38 +80,24 @@ function CMD.count()
 end
 
 -- 踢玩家
-function CMD.kick(uid)
+function CMD.kick(data)
+
+    local uid = data.uid
+
+    local player = players[uid]
+
+    -- 已经离线，幂等返回成功
+    if not player then
+        return {}
+    end
 
     -- TODO
-    -- 通知 Provider API 断开连接(由 Provider API 完成断连接)
-    if not players[uid] then
-        return nil, {
-            code = constant.ERROR.USER_NOT_FOUND,
-            msg = "user not found",
-        }
-    end
+    -- 通知 Provider API / Gateway 断开连接
 
-    local ok, err = CMD.offline(uid)
-    if not ok then
-        return nil, err
-    end
+    players[uid] = nil
+    online_count = online_count - 1
 
     return {}
-end
-
-function CMD.authenticate(req)
-
-    if players[req.uid] then
-        return {
-            success = true,
-        }
-    end
-
-    local ok = CMD.online(req.uid)
-
-    return {
-        success = ok,
-    }
 end
 
 -- 获取所有在线 uid（GM 用）, 返回 {1001,1002,1005}

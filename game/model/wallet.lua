@@ -21,30 +21,33 @@ function M.get(uid)
 end
 
 -- 创建用户钱包, 测试先给余额 10000
-function M.create(uid, balance)
+-- function M.create(uid, agent_id, balance)
 
-    local sql = string.format([[
-        INSERT INTO %s(
-            uid,
-            balance,
-            freeze_balance,
-            create_time
-        )
-        VALUES(
-            %d,
-            %d,
-            0,
-            %d
-        )
-    ]],
-        TABLE,
-        uid,
-        balance,
-        os.time()
-    )
+--     local sql = string.format([[
+--         INSERT INTO %s(
+--             uid,
+--             agent_id,
+--             balance,
+--             freeze_balance,
+--             create_time
+--         )
+--         VALUES(
+--             %d,
+--             %d,
+--             %d,
+--             0,
+--             %d
+--         )
+--     ]],
+--         TABLE,
+--         uid,
+--         agent_id,
+--         balance,
+--         os.time()
+--     )
 
-    return db.query(sql)
-end
+--     return db.query(sql)
+-- end
 
 -- 充值
 function M.add(uid, amount)

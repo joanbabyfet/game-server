@@ -14,8 +14,8 @@ function M.init()
         "rpc.proto",
         "system.proto",
         "user.proto",
-        --"wallet.proto",
-        --"slot.proto",
+        "wallet.proto",
+        "slot.proto",
     }
 
     for _, file in ipairs(files) do

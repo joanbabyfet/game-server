@@ -123,6 +123,9 @@ end
 -- 更新订单为已回滚 (只有已结算才能回滚)
 function M.rollback(order_no, reason)
 
+    -- 回滚原因可选填
+    reason = reason or ""
+
     local sql = string.format([[
         UPDATE `%s`
         SET

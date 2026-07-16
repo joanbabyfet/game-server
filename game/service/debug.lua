@@ -72,33 +72,16 @@ function CMD.reload_game(game_id)
 
 end
 
--- Login
-function CMD.login(account)
-
-    local login = skynet.localname(".login")
-
-    return skynet.call(
-        login,
-        "lua",
-        "login",
-        account
-    )
-
-end
-
 -- Slot
-function CMD.spin(uid, agent_id, game_id, bet)
+function CMD.spin(data)
 
     local slot = skynet.localname(".slot")
 
     return skynet.call(
         slot,
         "lua",
-        "spin",
-        uid,
-        agent_id,
-        game_id,
-        bet
+        "bet",
+        data
     )
 
 end

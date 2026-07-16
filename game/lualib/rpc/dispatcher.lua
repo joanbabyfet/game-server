@@ -6,28 +6,29 @@ local M = {}
 
 local handlers = {
 
-    [command.CMD_AUTHENTICATE] = function(req)
-        return skynet.call(".login", "lua", "authenticate", req)
+    -- 玩家登录（建立 Session）
+    [command.CMD_LOGIN] = function(req)
+        return skynet.call(".player_mgr", "lua", "online", req)
+    end,
+
+    [command.CMD_KICK] = function(req)
+        return skynet.call(".player_mgr", "lua", "kick", req)
     end,
 
     [command.CMD_BALANCE] = function(req)
         return skynet.call(".wallet", "lua", "balance", req)
     end,
 
-    [command.CMD_BET] = function(req)
-        return skynet.call(".slot", "lua", "bet", req)
+    [command.CMD_SPIN] = function(req)
+        return skynet.call(".slot", "lua", "spin", req)
     end,
 
     [command.CMD_ROLLBACK] = function(req)
-        return skynet.call(".rollback", "lua", "rollback", req)
+        return skynet.call(".wallet", "lua", "rollback", req)
     end,
 
     [command.CMD_PING] = function(req)
         return skynet.call(".system", "lua", "ping", req)
-    end,
-
-    [command.CMD_KICK] = function(req)
-        return skynet.call(".player_mgr", "lua", "kick", req)
     end,
 }
 

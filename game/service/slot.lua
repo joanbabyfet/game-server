@@ -8,13 +8,14 @@ local CMD = {}
 local config_mgr = skynet.localname(".config_mgr")
 
 -- 普通旋转
-function CMD.spin(uid, agent_id, game_id, bet)
+function CMD.spin(data)
+
     -- 游戏配置
     local cfg = skynet.call(
         config_mgr,
         "lua",
         "get_game",
-        game_id
+        data.game_id
     )
 
     if not cfg then
@@ -39,13 +40,21 @@ function CMD.spin(uid, agent_id, game_id, bet)
     end
 
     -- 进入游戏逻辑
-    local data, err = slot_logic.spin(uid, agent_id, game_id, bet)
+    local resp, err = slot_logic.spin(
+        data.uid,
+        data.agent_id,
+        data.game_id,
+        data.bet_amount,
+        data.request_id,
+        data.order_no,
+        data.round_id
+    )
 
     if err then
         return nil, err
     end
 
-    return data
+    return resp
 end
 
 -- Free Spin

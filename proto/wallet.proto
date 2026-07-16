@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package wallet;
+
+option go_package = "game-api/proto/walletpb;walletpb";
+
+//
+// Balance
+//
+
+message BalanceReq {
+
+    // 玩家ID
+    uint64 uid = 1;
+
+    // 代理ID
+    uint32 agent_id = 2;
+
+}
+
+message BalanceResp {
+
+    // 钱包余额（最小货币单位）
+    uint64 balance = 1;
+
+    // 币别
+    string currency = 2;
+
+}
+
+//
+// Rollback
+//
+
+message RollbackReq {
+
+    // 玩家ID
+    uint64 uid = 1;
+
+    // 代理ID
+    uint32 agent_id = 2;
+
+    // 原下注单号
+    string order_no = 3;
+
+    // 幂等请求ID
+    string request_id = 4;
+
+    // 回滚原因（可选）
+    string reason = 5;
+}
+
+message RollbackResp {
+
+    // 回滚后余额
+    uint64 balance = 1;
+
+}
