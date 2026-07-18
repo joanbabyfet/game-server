@@ -35,7 +35,21 @@ function CMD.rollback(data)
     end
 
     return {
-        balance = util.to_amount(balance),
+        balance = balance,
+    }
+end
+
+-- 取消未结算注单（PROCESSING -> ROLLBACK）
+function CMD.cancel(data)
+
+    local ok, err = wallet_logic.cancel(data)
+
+    if err then
+        return nil, err
+    end
+
+    return {
+        success = ok,
     }
 end
 

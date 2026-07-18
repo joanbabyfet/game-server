@@ -56,3 +56,26 @@ message RollbackResp {
     uint64 balance = 1;
 
 }
+
+// Cancel
+
+message CancelReq {
+
+    // 玩家ID
+    uint64 uid = 1;
+
+    // 代理ID
+    uint32 agent_id = 2;
+
+    // 原下注单号
+    string order_no = 3;
+
+    // 幂等请求ID
+    string request_id = 4;
+
+    // 回滚原因（可选）
+    string reason = 5;
+}
+
+message CancelResp {
+}

@@ -57,15 +57,15 @@ function M.gen_uid()
     return tostring(snowflake.next_id())
 end
 
--- 金额转最小单位
-function M.to_money(value)
-    return math.floor(value * M.MONEY_SCALE)
-end
+-- 金额转最小单位 (弃用 统一由provider api做转换)
+-- function M.to_money(value)
+--     return math.floor(value * M.MONEY_SCALE)
+-- end
 
--- 最小单位转金额
-function M.to_amount(value)
-    return value / M.MONEY_SCALE
-end
+-- 最小单位转金额 (弃用 统一由provider api做转换)
+-- function M.to_amount(value)
+--     return value / M.MONEY_SCALE
+-- end
 
 -- 百分比 util.percent(1000, 1) = 10
 function M.percent(value, rate)

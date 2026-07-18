@@ -10,6 +10,7 @@ M.TYPE = {
     PROVIDER = 1,
     ADMIN    = 2,
     RETRY    = 3,
+    CANCEL   = 4, --建单成功，但还没结算就取消
 }
 
 -- 回滚状态

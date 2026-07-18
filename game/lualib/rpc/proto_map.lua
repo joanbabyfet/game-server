@@ -13,8 +13,8 @@ local M = {
     },
 
     [command.CMD_SPIN] = {
-        req = "slot.BetReq",
-        resp = "slot.BetResp",
+        req = "slot.SpinReq",
+        resp = "slot.SpinResp",
     },
 
     [command.CMD_BALANCE] = {
@@ -25,6 +25,11 @@ local M = {
     [command.CMD_ROLLBACK] = {
         req = "wallet.RollbackReq",
         resp = "wallet.RollbackResp",
+    },
+
+    [command.CMD_CANCEL] = {
+        req = "wallet.CancelReq",
+        resp = "wallet.CancelResp",
     },
 
     [command.CMD_PING] = {

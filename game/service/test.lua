@@ -162,10 +162,10 @@ local function test_spin(uid, agent_id, game_id, bet, count)
     end
 
     skynet.error(string.format(
-        "[RTP] spin=%d bet=%.2f win=%.2f rtp=%.4f%%",
+        "[RTP] spin=%d bet=%d win=%d rtp=%.4f%%",
         stat.spin,
-        util.to_amount(stat.bet),
-        util.to_amount(stat.win),
+        stat.bet,
+        stat.win,
         rtp
     ))
 end
@@ -245,7 +245,7 @@ local function test_wallet(uid)
 
     skynet.error(
         "[TEST][WALLET] balance =",
-        util.to_amount(resp.balance)
+        resp.balance
     )
 
 end

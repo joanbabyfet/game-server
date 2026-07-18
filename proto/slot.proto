@@ -13,6 +13,9 @@ message SpinReq {
     uint32 agent_id = 5;
     uint32 game_id = 6;
     int64 bet_amount = 7;
+    string currency = 8;
+
+    bool debug_fail = 99; 
 }
 
 message SpinResp {

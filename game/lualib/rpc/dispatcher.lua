@@ -27,6 +27,10 @@ local handlers = {
         return skynet.call(".wallet", "lua", "rollback", req)
     end,
 
+    [command.CMD_CANCEL] = function(req)
+        return skynet.call(".wallet", "lua", "cancel", req)
+    end,
+
     [command.CMD_PING] = function(req)
         return skynet.call(".system", "lua", "ping", req)
     end,

@@ -40,15 +40,7 @@ function CMD.spin(data)
     end
 
     -- 进入游戏逻辑
-    local resp, err = slot_logic.spin(
-        data.uid,
-        data.agent_id,
-        data.game_id,
-        data.bet_amount,
-        data.request_id,
-        data.order_no,
-        data.round_id
-    )
+    local resp, err = slot_logic.spin(data)
 
     if err then
         return nil, err

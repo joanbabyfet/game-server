@@ -25,18 +25,13 @@ function M.create(data)
             agent_id,
             game_id,
             bet_amount,
-            original_win,
-            win_amount,
-            profit,
             balance_before,
             balance_after,
+            currency,
             reels,
             win_lines,
             is_free_spin,
-            free_spin_id,
-            free_spin_index,
             status,
-            settle_time,
             create_time
         )
         VALUES(
@@ -49,14 +44,9 @@ function M.create(data)
             %d,
             %d,
             %d,
-            %d,
-            %d,
-            %d,
             %s,
             %s,
-            %d,
             %s,
-            %d,
             %d,
             %d,
             %d
@@ -70,18 +60,13 @@ function M.create(data)
         data.agent_id,
         data.game_id,
         data.bet_amount,
-        data.original_win,
-        data.win_amount,
-        data.profit,
-        data.balance_before,
-        data.balance_after,
-        mysql.quote_sql_str(json.encode(data.reels)),
-        mysql.quote_sql_str(json.encode(data.win_lines)),
+        data.balance_before or 0,
+        data.balance_after or 0,
+        mysql.quote_sql_str(data.currency or ""),
+        mysql.quote_sql_str(json.encode(data.reels or {})),
+        mysql.quote_sql_str(json.encode(data.win_lines or {})),
         data.is_free_spin or 0,
-        mysql.quote_sql_str(data.free_spin_id or ""),
-        data.free_spin_index or 0,
         data.status,
-        data.settle_time,
         data.create_time
     )
 
@@ -120,10 +105,9 @@ function M.get_by_order_no(order_no)
     return db.get_one(sql)
 end
 
--- 更新订单为已回滚 (只有已结算才能回滚)
-function M.rollback(order_no, reason)
+-- 更新订单状态 (私有函数)
+local function update_status(order_no, from_status, to_status, reason)
 
-    -- 回滚原因可选填
     reason = reason or ""
 
     local sql = string.format([[
@@ -139,11 +123,75 @@ function M.rollback(order_no, reason)
         LIMIT 1
     ]],
         TABLE,
-        M.STATUS.ROLLBACK,
+        to_status,
         mysql.quote_sql_str(reason),
         os.time(),
         mysql.quote_sql_str(order_no),
-        M.STATUS.SETTLED
+        from_status
+    )
+
+    return db.query(sql)
+end
+
+-- 已结算订单回滚（SETTLED -> ROLLBACK）
+function M.finish_rollback(order_no, reason)
+
+    return update_status(
+        order_no,
+        M.STATUS.SETTLED,
+        M.STATUS.ROLLBACK,
+        reason
+    )
+end
+
+-- 未结算订单取消（PROCESSING -> ROLLBACK）
+function M.cancel(order_no, reason)
+
+    return update_status(
+        order_no,
+        M.STATUS.PROCESSING,
+        M.STATUS.ROLLBACK,
+        reason
+    )
+end
+
+-- 更新注单(结算完成)
+function M.update(data)
+
+    local sql = string.format([[
+        UPDATE `%s`
+        SET
+            original_win = %d,
+            win_amount = %d,
+            profit = %d,
+            balance_after = %d,
+            reels = %s,
+            win_lines = %s,
+            risk_hit = %d,
+            risk_reason = %s,
+            free_spin_id = %s,
+            free_spin_index = %d,
+            status = %d,
+            settle_time = %d
+        WHERE
+            order_no = %s AND status = %d
+        LIMIT 1
+    ]],
+        TABLE,
+        data.original_win,
+        data.win_amount,
+        data.profit,
+        data.balance_after,
+        mysql.quote_sql_str(json.encode(data.reels)),
+        mysql.quote_sql_str(json.encode(data.win_lines)),
+        data.risk_hit and 1 or 0,
+        mysql.quote_sql_str(data.risk_reason or ""),
+        mysql.quote_sql_str(data.free_spin_id or ""),
+        data.free_spin_index or 0,
+        data.status,
+        data.settle_time,
+        mysql.quote_sql_str(data.order_no),
+        M.STATUS.PROCESSING -- 避免 已经 SETTLED 的订单再次被更新
     )
 
     return db.query(sql)

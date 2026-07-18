@@ -10,6 +10,7 @@ M.CMD_KICK         = 1002
 M.CMD_BALANCE      = 2001
 M.CMD_SPIN         = 2002
 M.CMD_ROLLBACK     = 2003
+M.CMD_CANCEL       = 2004
 
 M.CMD_PING         = 9999
 

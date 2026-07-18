@@ -1,6 +1,5 @@
 local pb = require "pb"
 local protoc = require "protoc".new()
-local skynet = require "skynet"
 
 local M = {}
 
